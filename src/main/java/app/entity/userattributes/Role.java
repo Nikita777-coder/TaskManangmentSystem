@@ -15,22 +15,22 @@ import static app.entity.userattributes.Permission.*;
 public enum Role {
     ADMIN(
             Set.of(
-                    ADMIN_READ,
-                    ADMIN_UPDATE,
-                    ADMIN_CREATE,
-                    ADMIN_DELETE,
-                    USER_READ_RECORDS,
-                    USER_UPDATE,
-                    USER_CREATE_RECORD,
-                    USER_DELETE_RECORD
+                    CREATE_TASK,
+                    UPDATE_TASK,
+                    WATCH_TASK,
+                    DELETE_TASK,
+                    CHANGE_STATUS_TASK,
+                    CHANGE_PRIORITY_TASK,
+                    UPDATE_EXECUTORS_TASK,
+                    MAKE_COMMENTS_TASK
             )
     ),
     USER(
             Set.of(
-                    USER_READ_RECORDS,
-                    USER_UPDATE,
-                    USER_CREATE_RECORD,
-                    USER_DELETE_RECORD
+                    CHANGE_STATUS_TASK,
+                    MAKE_COMMENTS_TASK,
+                    UPDATE_TASK,
+                    WATCH_TASK
             )
     );
 

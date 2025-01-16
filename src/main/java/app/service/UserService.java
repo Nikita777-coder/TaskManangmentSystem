@@ -1,6 +1,8 @@
 package app.service;
 
 import app.entity.UserEntity;
+import app.entity.userattributes.Permission;
+import app.entity.userattributes.Role;
 import app.mapper.UserMapper;
 import app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,13 +13,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(isolation = Isolation.READ_COMMITTED)
 public class UserService {
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
-    private final PasswordEncoder passwordEncoder;
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public UserDetails createUser(UserEntity entity) {
         if (userRepository.findByEmail(entity.getEmail()).isPresent()) {
@@ -27,17 +30,24 @@ public class UserService {
         return userRepository.save(entity);
     }
     public UserDetails getUser(String email) {
+        return getUserByEmail(email);
+    }
+
+    public UserEntity getUser(UserDetails userDetails) {
+        return getUserByEmail(userDetails.getUsername());
+    }
+    public boolean hasUserRequiredPermissions(UserEntity user, List<Permission> permissions) {
+        for (Permission permission : permissions) {
+            if (!user.getRole().getPermissions().contains(permission)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private UserEntity getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
-
-//    private UserEntity getUserByEmail(String email) {
-//        Optional<UserEntity> currentUser = userRepository.findByEmail(email);
-//
-//        if (currentUser.isEmpty()) {
-//            throw new RuntimeException("get current user error!");
-//        }
-//
-//        return currentUser.get();
-//    }
 }

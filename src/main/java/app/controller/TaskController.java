@@ -50,4 +50,6 @@ public class TaskController {
                                  @RequestParam("task-id") UUID id) {
         taskService.delete(currentUserDetails, id);
     }
+
+    //
 }

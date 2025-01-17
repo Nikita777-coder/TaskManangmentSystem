@@ -1,5 +1,6 @@
 package app.dto.auth;
 
+import app.entity.userattributes.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -18,6 +19,8 @@ public class SignUpRequest {
     private String email;
 
     private String name = "";
+
+    private Role userRole;
 
     @NotBlank(message = "password can't be empty!")
     @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",

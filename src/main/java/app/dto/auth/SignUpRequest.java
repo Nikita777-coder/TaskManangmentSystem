@@ -18,8 +18,6 @@ public class SignUpRequest {
             message = "email must be in format: <local-part>@<service-name>.<region>")
     private String email;
 
-    private String name = "";
-
     private Role userRole;
 
     @NotBlank(message = "password can't be empty!")

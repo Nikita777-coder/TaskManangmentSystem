@@ -20,8 +20,8 @@ public interface TaskMapper {
     default void checkUpdateEntityOnPermissions(TaskEntity partiallyUpdatedEntity, Role userRole) {
         if (userRole == Role.USER && (
                 partiallyUpdatedEntity.getTaskPriority() != null ||
-                partiallyUpdatedEntity.getExecutorId() != null
-            )
+                partiallyUpdatedEntity.getExecutorEmail() != null
+            ) || partiallyUpdatedEntity.getComments() != null
         ) {
             throw new IllegalArgumentException("User deny change some properties, don't have access");
         }

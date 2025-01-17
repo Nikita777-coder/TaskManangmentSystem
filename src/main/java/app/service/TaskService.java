@@ -79,7 +79,7 @@ public class TaskService {
     }
 
     private void checkTaskAccess(UserEntity userEntity, TaskEntity foundTask) {
-        if (userEntity.getId() != foundTask.getExecutorId() || userEntity.getRole() != Role.ADMIN) {
+        if (!userEntity.getEmail().equals(foundTask.getExecutorEmail()) || userEntity.getRole() != Role.ADMIN) {
             throw new IllegalArgumentException("Access deny");
         }
     }

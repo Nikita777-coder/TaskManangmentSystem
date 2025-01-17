@@ -32,12 +32,12 @@ public class TaskEntity {
     @Column(name = "task_priority")
     private TaskPriority taskPriority;
 
-    @Column(name = "author_id")
-    private UUID authorId;
+    @Column(name = "author_email")
+    private UUID authorEmail;
 
-    @Column(name = "executor_id")
-    private UUID executorId;
+    @Column(name = "executor_email")
+    private String executorEmail;
 
-    @OneToMany(mappedBy = "comments_for_tasks")
+    @OneToMany(mappedBy = "id")
     private List<CommentEntity> comments;
 }

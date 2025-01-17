@@ -3,6 +3,7 @@ package app.dto.auth;
 import app.entity.userattributes.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +19,8 @@ public class SignUpRequest {
             message = "email must be in format: <local-part>@<service-name>.<region>")
     private String email;
 
-    private Role userRole;
+    @NotNull(message = "can't be null")
+    private Role role;
 
     @NotBlank(message = "password can't be empty!")
     @Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",

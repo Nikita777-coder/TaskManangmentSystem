@@ -7,6 +7,7 @@ import app.entity.userattributes.Role;
 import app.mapper.TaskMapper;
 import app.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -28,7 +29,7 @@ public class TaskService {
         UserEntity userEntity = userService.getUser(currentUser);
 
         if (!userService.hasUserRequiredPermissions(userEntity, List.of(Permission.WATCH_TASK))) {
-            throw new IllegalArgumentException("User doesn't have permission for this operation");
+            throw new AccessDeniedException("Access deny");
         }
 
         TaskEntity foundTask = getTask(taskId);
@@ -39,14 +40,18 @@ public class TaskService {
 
     public UUID create(UserDetails currentUser, TaskEntity taskDetails) {
         if (!userService.hasUserRequiredPermissions(userService.getUser(currentUser), List.of(Permission.CREATE_TASK))) {
-            throw new IllegalArgumentException("User doesn't have permission for this operation");
+            throw new AccessDeniedException("Access deny");
+        }
+
+        if (!taskDetails.getAuthorEmail().equals(currentUser.getUsername())) {
+            throw new AccessDeniedException("Access deny");
         }
 
         taskDetails.setId(null);
+        taskDetails.setComments(null);
         return taskRepository.save(taskDetails).getId();
     }
 
-    // чекнуть, что у юзера есть права на изменение статусов, добавление комментов и т д при мапинге
     public TaskEntity update(
             UserDetails currentUser,
             UUID taskId,
@@ -55,11 +60,15 @@ public class TaskService {
         UserEntity userEntity = userService.getUser(currentUser);
 
         if (!userService.hasUserRequiredPermissions(userEntity, List.of(Permission.UPDATE_TASK))) {
-            throw new IllegalArgumentException("User doesn't have permission for this operation");
+            throw new AccessDeniedException("Access deny");
         }
 
         TaskEntity foundTask = getTask(taskId);
         checkTaskAccess(userEntity, foundTask);
+
+        if (userEntity.getRole() == Role.ADMIN && !userEntity.getEmail().equals(foundTask.getAuthorEmail())) {
+            throw new AccessDeniedException("Access deny");
+        }
 
         foundTask = taskMapper.mapTasks(updatedTask, userEntity.getRole());
         foundTask.setId(taskId);
@@ -79,8 +88,8 @@ public class TaskService {
     }
 
     private void checkTaskAccess(UserEntity userEntity, TaskEntity foundTask) {
-        if (!userEntity.getEmail().equals(foundTask.getExecutorEmail()) || userEntity.getRole() != Role.ADMIN) {
-            throw new IllegalArgumentException("Access deny");
+        if (userEntity.getRole() != Role.ADMIN && !userEntity.getEmail().equals(foundTask.getExecutorEmail())) {
+            throw new AccessDeniedException("Access deny");
         }
     }
 

@@ -33,7 +33,7 @@ public class TaskEntity {
     private TaskPriority taskPriority;
 
     @Column(name = "author_email")
-    private UUID authorEmail;
+    private String authorEmail;
 
     @Column(name = "executor_email")
     private String executorEmail;

@@ -6,6 +6,7 @@ import app.entity.userattributes.Role;
 import app.mapper.UserMapper;
 import app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -36,7 +37,7 @@ public class UserService {
 
     public List<UserEntity> getAllUsers(@AuthenticationPrincipal UserDetails curUser) {
         if (getUserByEmail(curUser.getUsername()).getRole() != Role.ADMIN) {
-            throw new IllegalArgumentException("Access deny");
+            throw new AccessDeniedException("Access deny");
         }
 
         return userRepository.findAll();

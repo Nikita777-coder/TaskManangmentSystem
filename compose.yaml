@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: simple
+      POSTGRES_PASSWORD: simple
+      POSTGRES_DB: task_management_system
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+
+  app:
+    build:
+      context: .
+      dockerfile: .Dockerfile
+    container_name: my_app
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: task_management_system
+      DB_USER: simple
+      DB_PASSWORD: simple
+      JWT_SIGNING_KEY: aef72d8bc84e66100cbaba56bf48d91e197f342b0f6cd96b5575f9fbc9ccb629
+    depends_on:
+      - postgres
+    networks:
+      - app_network
+
+volumes:
+  postgres_data:
+
+networks:
+  app_network:

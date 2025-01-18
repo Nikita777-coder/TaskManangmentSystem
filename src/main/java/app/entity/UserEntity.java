@@ -30,7 +30,7 @@ public class UserEntity implements UserDetails {
     @Column(unique = true)
     private String email;
 
-    @Column(columnDefinition = "varchar(32) default 'USER'")
+    @Column
     @Enumerated(value = EnumType.STRING)
     private Role role = Role.USER;
 

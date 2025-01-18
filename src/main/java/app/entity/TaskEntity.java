@@ -3,9 +3,7 @@ package app.entity;
 import app.entity.taskattributes.TaskPriority;
 import app.entity.taskattributes.TaskStatus;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,6 +12,8 @@ import java.util.UUID;
 @Table(name="tasks")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class TaskEntity {
     @Id

@@ -26,4 +26,8 @@ public class CommentEntity {
 
     @Column(name = "datetime_mark")
     private LocalDateTime commentTimeCreation;
+
+    @ManyToOne(cascade = {CascadeType.REFRESH, CascadeType.PERSIST})
+    @JoinColumn(name = "task_id")
+    private TaskEntity taskEntity;
 }

@@ -49,6 +49,11 @@ public class TaskService {
 
         taskDetails.setId(null);
         taskDetails.setComments(null);
+
+        if (taskDetails.getExecutorEmail() != null) {
+            userService.getUser(taskDetails.getExecutorEmail());
+        }
+
         return taskRepository.save(taskDetails).getId();
     }
 
@@ -71,6 +76,11 @@ public class TaskService {
         }
 
         foundTask = taskMapper.mapTasks(updatedTask, userEntity.getRole());
+
+        if (userEntity.getRole() == Role.ADMIN && updatedTask.getExecutorEmail() != null) {
+            userService.getUser(updatedTask.getExecutorEmail());
+        }
+
         foundTask.setId(taskId);
 
         return taskRepository.save(foundTask);

@@ -27,11 +27,7 @@ public class TaskService {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public TaskEntity get(UserDetails currentUser, UUID taskId) {
         UserEntity userEntity = userService.getUser(currentUser);
-
-        if (!userService.hasUserRequiredPermissions(userEntity, List.of(Permission.WATCH_TASK))) {
-            throw new AccessDeniedException("Access deny");
-        }
-
+        checkUserPermissions(userEntity, List.of(Permission.WATCH_TASK));
         TaskEntity foundTask = getTask(taskId);
         checkTaskAccess(userEntity, foundTask);
 
@@ -39,20 +35,14 @@ public class TaskService {
     }
 
     public UUID create(UserDetails currentUser, TaskEntity taskDetails) {
-        if (!userService.hasUserRequiredPermissions(userService.getUser(currentUser), List.of(Permission.CREATE_TASK))) {
-            throw new AccessDeniedException("Access deny");
-        }
-
+        checkUserPermissions(userService.getUser(currentUser), List.of(Permission.CREATE_TASK));
         if (!taskDetails.getAuthorEmail().equals(currentUser.getUsername())) {
             throw new AccessDeniedException("Access deny");
         }
 
         taskDetails.setId(null);
         taskDetails.setComments(null);
-
-        if (taskDetails.getExecutorEmail() != null) {
-            userService.getUser(taskDetails.getExecutorEmail());
-        }
+        checkExecutor(taskDetails);
 
         return taskRepository.save(taskDetails).getId();
     }
@@ -63,11 +53,7 @@ public class TaskService {
             TaskEntity updatedTask
     ) {
         UserEntity userEntity = userService.getUser(currentUser);
-
-        if (!userService.hasUserRequiredPermissions(userEntity, List.of(Permission.UPDATE_TASK))) {
-            throw new AccessDeniedException("Access deny");
-        }
-
+        checkUserPermissions(userEntity, List.of(Permission.UPDATE_TASK));
         TaskEntity foundTask = getTask(taskId);
         checkTaskAccess(userEntity, foundTask);
 
@@ -76,10 +62,7 @@ public class TaskService {
         }
 
         foundTask = taskMapper.mapTasks(updatedTask, userEntity.getRole());
-
-        if (userEntity.getRole() == Role.ADMIN && updatedTask.getExecutorEmail() != null) {
-            userService.getUser(updatedTask.getExecutorEmail());
-        }
+        if (userEntity.getRole() == Role.ADMIN) checkExecutor(updatedTask);
 
         foundTask.setId(taskId);
 
@@ -89,11 +72,9 @@ public class TaskService {
             UserDetails userDetails,
             UUID taskId
     ) {
-        if (!userService.hasUserRequiredPermissions(userService.getUser(userDetails), List.of(Permission.DELETE_TASK))) {
-            throw new IllegalArgumentException("User doesn't have permission for this operation");
-        }
-
+        checkUserPermissions(userService.getUser(userDetails), List.of(Permission.DELETE_TASK));
         TaskEntity foundTask = getTask(taskId);
+
         taskRepository.delete(foundTask);
     }
 
@@ -106,5 +87,15 @@ public class TaskService {
     private TaskEntity getTask(UUID id) {
         return taskRepository.findById(id).
                 orElseThrow(() -> new IllegalArgumentException("task didn't find"));
+    }
+    private void checkUserPermissions(UserEntity userEntity, List<Permission> permissions) {
+        if (!userService.hasUserRequiredPermissions(userEntity, permissions)) {
+            throw new AccessDeniedException("Access deny");
+        }
+    }
+    private void checkExecutor(TaskEntity taskEntity) {
+        if (taskEntity.getExecutorEmail() != null) {
+            userService.getUser(taskEntity.getExecutorEmail());
+        }
     }
 }

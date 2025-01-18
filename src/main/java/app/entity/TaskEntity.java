@@ -38,6 +38,10 @@ public class TaskEntity {
     @Column(name = "executor_email")
     private String executorEmail;
 
-    @OneToMany(mappedBy = "id")
+    @OneToMany(
+            mappedBy = "id",
+            cascade = {CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.REMOVE},
+            orphanRemoval = true
+    )
     private List<CommentEntity> comments;
 }

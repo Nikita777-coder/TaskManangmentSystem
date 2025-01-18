@@ -15,7 +15,9 @@
 ![img_2.png](img_2.png)
 
 В JWT_SIGNING_KEY надо прописать случайный ключ авторизации (jwt secret), его можно сгенерировать на сайте [https://jwtsecret.com/generate](https://jwtsecret.com/generate)
+
 4. В командной строке пропишите команду ```docker-compose up```
+   
 5. Приложение должно заработать на 8080 порту, об этом также должны свидетельствовать строки на фото ниже, после развертки приложения docker-compose
 
 ![img_3.png](img_3.png)

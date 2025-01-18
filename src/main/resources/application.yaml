@@ -15,12 +15,6 @@ spring:
     console:
       enabled: true
 
-logging:
-  level:
-    org:
-      springframework:
-        security=DEBUG:
-
 # need to remove values when realize
 server:
   jwt:

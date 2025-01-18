@@ -7,6 +7,9 @@ import app.entity.userattributes.Role;
 import app.mapper.TaskMapper;
 import app.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -76,6 +79,37 @@ public class TaskService {
         TaskEntity foundTask = getTask(taskId);
 
         taskRepository.delete(foundTask);
+    }
+    public Page<TaskEntity> getAuthorTasks(UserDetails userDetails,
+                                           String authorEmail,
+                                           Pageable pageable) {
+        UserEntity userEntity = userService.getUser(userDetails);
+
+        checkUserPermissions(userEntity, List.of(Permission.WATCH_TASK));
+
+        if (userEntity.getRole() != Role.ADMIN) {
+            throw new AccessDeniedException("AccessDeny");
+        }
+
+        Page<TaskEntity> tasks = taskRepository.findAllByAuthorEmail(authorEmail, pageable);
+
+        return new PageImpl<>(tasks.getContent(), pageable, tasks.getTotalElements());
+    }
+
+    public Page<TaskEntity> getExecutorTasks(UserDetails userDetails,
+                                             String executorEmail,
+                                             Pageable pageable) {
+        UserEntity userEntity = userService.getUser(userDetails);
+
+        checkUserPermissions(userEntity, List.of(Permission.WATCH_TASK));
+
+        if (userEntity.getRole() != Role.ADMIN || !userDetails.getUsername().equals(executorEmail)) {
+            throw new AccessDeniedException("AccessDeny");
+        }
+
+        Page<TaskEntity> tasks = taskRepository.findAllByExecutorEmail(executorEmail, pageable);
+
+        return new PageImpl<>(tasks.getContent(), pageable, tasks.getTotalElements());
     }
 
     private void checkTaskAccess(UserEntity userEntity, TaskEntity foundTask) {

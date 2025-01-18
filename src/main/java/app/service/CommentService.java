@@ -1,6 +1,7 @@
 package app.service;
 
 import app.dto.comment.Comment;
+import app.dto.comment.UpdateComment;
 import app.entity.CommentEntity;
 import app.entity.TaskEntity;
 import app.entity.UserEntity;
@@ -40,16 +41,29 @@ public class CommentService {
         TaskEntity taskEntity = getTask(newComment.getTaskId());
         checkUserPermissionToAddComments(taskEntity, userEntity);
 
-        return commentRepository.save(commentMapper.commentToCommentEntity(newComment, userDetails)).getId();
+        return commentRepository.save(commentMapper.commentToCommentEntity(newComment, userDetails, taskEntity)).getId();
     }
     public CommentEntity update(UserDetails userDetails,
-                                Comment updatedComment) {
+                                UpdateComment updatedComment) {
         UserEntity userEntity = userService.getUser(userDetails);
         checkUserPermissions(userEntity, List.of(Permission.MAKE_COMMENTS_TASK));
-        TaskEntity taskEntity = getTask(updatedComment.getTaskId());
-        checkUserPermissionToAddComments(taskEntity, userEntity);
+        CommentEntity commentEntity = getComment(updatedComment.getCommentId());
 
-        return commentRepository.save(commentMapper.commentToCommentEntity(updatedComment, userDetails));
+        if (!commentEntity.getUserEmail().equals(userDetails.getUsername())) {
+            throw new AccessDeniedException("Access deny");
+        }
+
+        if (!updatedComment.getComment().getTaskId().equals(commentEntity.getTaskEntity().getId())) {
+            throw new IllegalArgumentException("not correct taskId");
+        }
+
+        checkUserPermissionToAddComments(commentEntity.getTaskEntity(), userEntity);
+        CommentEntity updated = commentMapper.commentToCommentEntity(updatedComment);
+        updated.setUserEmail(userDetails.getUsername());
+        updated.setId(commentEntity.getId());
+        updated.setTaskEntity(commentEntity.getTaskEntity());
+
+        return commentRepository.save(updated);
     }
     public void delete(UserDetails userDetails,
                        UUID commentId) {

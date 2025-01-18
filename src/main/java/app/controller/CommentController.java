@@ -2,6 +2,7 @@ package app.controller;
 
 import app.dto.comment.Comment;
 import app.dto.comment.DeleteComment;
+import app.dto.comment.UpdateComment;
 import app.entity.CommentEntity;
 import app.service.CommentService;
 import jakarta.validation.Valid;
@@ -39,7 +40,7 @@ public class CommentController {
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public CommentEntity updateComment(@AuthenticationPrincipal UserDetails userDetails,
-                                       @Valid @RequestBody Comment commentUpdate) {
+                                       @Valid @RequestBody UpdateComment commentUpdate) {
         return commentService.update(userDetails, commentUpdate);
     }
 

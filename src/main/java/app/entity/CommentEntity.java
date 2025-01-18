@@ -1,5 +1,6 @@
 package app.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,5 +30,6 @@ public class CommentEntity {
 
     @ManyToOne(cascade = {CascadeType.REFRESH, CascadeType.PERSIST})
     @JoinColumn(name = "task_id")
+    @JsonIgnore
     private TaskEntity taskEntity;
 }

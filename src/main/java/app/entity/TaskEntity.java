@@ -39,7 +39,7 @@ public class TaskEntity {
     private String executorEmail;
 
     @OneToMany(
-            mappedBy = "id",
+            mappedBy = "taskEntity",
             cascade = {CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.REMOVE},
             orphanRemoval = true
     )
